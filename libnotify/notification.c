@@ -971,8 +971,8 @@ get_notification_gicon (NotifyNotification  *notification,
                                 g_byte_array_append (bytes_array, buf, read);
                         } else {
                                 if (read < 0) {
-                                        g_byte_array_unref (bytes_array);
-                                        bytes_array = NULL;
+                                        g_clear_pointer (&bytes_array,
+                                                         g_byte_array_unref);
                                 }
 
                                 break;
@@ -986,9 +986,9 @@ get_notification_gicon (NotifyNotification  *notification,
                         bytes_array = NULL;
 
                         gicon = g_bytes_icon_new (bytes);
-                } else if (bytes_array) {
-                        g_byte_array_unref (bytes_array);
                 }
+
+                g_clear_pointer (&bytes_array, g_byte_array_unref);
         }
 
         g_clear_object (&input);
