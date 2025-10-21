@@ -957,18 +957,23 @@ get_notification_gicon (NotifyNotification  *notification,
 
         if (input) {
                 GByteArray *bytes_array = g_byte_array_new ();
-                guint8 buf[1024];
+                GInputStream *buffered_stream;
+
+                buffered_stream = g_buffered_input_stream_new (G_INPUT_STREAM (input));
 
                 while (TRUE) {
                         gssize read;
 
-                        read = g_input_stream_read (G_INPUT_STREAM (input),
-                                                    buf,
-                                                    G_N_ELEMENTS (buf),
-                                                    NULL, error);
+                        read = g_buffered_input_stream_fill (G_BUFFERED_INPUT_STREAM (buffered_stream),
+                                                             -1, NULL, error);
 
                         if (read > 0) {
-                                g_byte_array_append (bytes_array, buf, read);
+                                gconstpointer buffer;
+                                gsize buffer_size;
+
+                                buffer = g_buffered_input_stream_peek_buffer (G_BUFFERED_INPUT_STREAM (buffered_stream),
+                                                                              &buffer_size);
+                                g_byte_array_append (bytes_array, buffer, buffer_size);
                         } else {
                                 if (read < 0) {
                                         g_clear_pointer (&bytes_array,
@@ -989,6 +994,7 @@ get_notification_gicon (NotifyNotification  *notification,
                 }
 
                 g_clear_pointer (&bytes_array, g_byte_array_unref);
+                g_clear_object (&buffered_stream);
         }
 
         g_clear_object (&input);
