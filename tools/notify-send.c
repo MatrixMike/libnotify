@@ -155,7 +155,7 @@ on_sigint (gpointer data)
 {
         NotifyNotification *notification = data;
 
-        g_printerr ("Wait cancelled, closing notification\n");
+        g_printerr ("%s\n", N_("Wait cancelled, closing notification"));
 
         notify_notification_close (notification, NULL);
         g_main_loop_quit (loop);
@@ -211,7 +211,7 @@ handle_action (NotifyNotification *notify,
 static gboolean
 on_wait_timeout (gpointer data)
 {
-        g_printerr ("Wait timeout expired\n");
+        g_printerr ("%s\n", N_("Wait timeout expired"));
         g_main_loop_quit (loop);
 
         return FALSE;
@@ -533,7 +533,11 @@ main (int argc, char *argv[])
                 retval = notify_notification_show (notify, &error);
 
                 if (!retval) {
-                        g_printerr ("%s\n", error->message);
+                        g_autofree char *msg = NULL;
+
+                        msg = g_strdup_printf ("Failed to show notification: %s",
+                                               error->message);
+                        g_printerr ("%s\n", msg);
                         g_clear_error (&error);
                         show_error = TRUE;
                 }
