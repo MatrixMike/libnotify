@@ -987,10 +987,10 @@ get_notification_gicon (NotifyNotification  *notification,
                 if (bytes_array && bytes_array->len) {
                         GBytes *bytes;
 
-                        bytes = g_byte_array_free_to_bytes (bytes_array);
-                        bytes_array = NULL;
+                        bytes = g_byte_array_free_to_bytes (g_steal_pointer (&bytes_array));
 
                         gicon = g_bytes_icon_new (bytes);
+                        g_clear_pointer (&bytes, g_bytes_unref);
                 }
 
                 g_clear_pointer (&bytes_array, g_byte_array_unref);
