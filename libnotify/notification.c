@@ -965,7 +965,7 @@ get_notification_gicon (NotifyNotification  *notification,
                         read = g_input_stream_read (G_INPUT_STREAM (input),
                                                     buf,
                                                     G_N_ELEMENTS (buf),
-                                                    NULL, NULL);
+                                                    NULL, error);
 
                         if (read > 0) {
                                 g_byte_array_append (bytes_array, buf, read);
